@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>HDFC Mutual Fund FAQ Assistant - Facts-Only Q&A</title>
+    <meta name="description" content="A facts-only, source-backed Retrieval-Augmented Generation (RAG) assistant for HDFC Mutual Fund schemes. Get objective metrics, exit loads, expense ratios, and management details without investment advice.">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Local Styling -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <i class="fa-solid fa-chart-line logo-icon"></i>
+                <div class="logo-text">
+                    <h1>HDFC MF Assistant</h1>
+                    <span class="sub-text">Official FAQ Portal</span>
+                </div>
+            </div>
+            <div class="disclaimer-pill" id="header-disclaimer">
+                <i class="fa-solid fa-triangle-exclamation"></i> Facts-Only. No Investment Advice.
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="app-main">
+        <div class="chat-container">
+            <!-- Scrollable Chat area -->
+            <div class="chat-history" id="chat-history-wrapper">
+                <!-- Welcome section (hidden once conversation starts) -->
+                <section class="welcome-section" id="welcome-container">
+                    <div class="welcome-card">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <h2>How can I help you today?</h2>
+                        <p id="welcome-description">
+                            I am a facts-only assistant for HDFC Mutual Fund schemes. I retrieve information directly from verified Groww product pages to answer your questions about scheme metrics, exit loads, NAV, and fund managers.
+                        </p>
+                    </div>
+
+                    <!-- Clickable Example Cards -->
+                    <div class="suggestions-area">
+                        <h3>Frequently Asked Queries</h3>
+                        <div class="suggestions-grid" id="example-questions-grid">
+                            <!-- Example cards will be dynamically loaded here -->
+                            <div class="suggestion-loading">
+                                <div class="dot-spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Messages container -->
+                <div class="messages-list" id="messages-list-wrapper"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sticky Bottom Input and Controls Area -->
+    <footer class="app-footer">
+        <div class="input-container">
+            <div class="compliance-banner">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Strict Compliance Mode Active: All personal details (PAN, Aadhaar, Accounts) are scrubbed locally.</span>
+            </div>
+            <form class="input-form" id="chat-query-form" autocomplete="off">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input 
+                        type="text" 
+                        id="user-query-input" 
+                        placeholder="Ask a factual question about HDFC mutual funds (e.g. exit load, NAV, manager)..." 
+                        required
+                    >
+                    <button type="submit" id="submit-query-btn" aria-label="Send query">
+                        <i class="fa-solid fa-arrow-up btn-icon"></i>
+                    </button>
+                </div>
+            </form>
+            <div class="footer-note">
+                <span>RAG FAQ Assistant retrieves public AMC data reference points. Certified SEBI details only.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Local App Javascript -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
