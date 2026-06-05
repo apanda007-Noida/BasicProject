@@ -3,6 +3,7 @@ import sys
 import time
 import logging
 import datetime
+# pyrefly: ignore [missing-import]
 import schedule
 
 # Ensure project root is in python path

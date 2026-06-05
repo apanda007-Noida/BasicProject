@@ -14,3 +14,4 @@ services:
         sync: false # User will input this in the Render dashboard
       - key: GROQ_API_KEY
         sync: false # User will input this in the Render dashboard
+
