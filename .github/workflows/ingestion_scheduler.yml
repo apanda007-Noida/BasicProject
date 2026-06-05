@@ -37,7 +37,6 @@ jobs:
     - name: Run Unit Test Suite
       # Mock key variables to run tests successfully on GitHub (since secret API keys won't be set by default)
       env:
-        GEMINI_API_KEY: ""
         GROQ_API_KEY: ""
         PYTHONPATH: "."
       run: |

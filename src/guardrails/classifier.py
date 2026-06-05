@@ -2,7 +2,7 @@ import os
 import json
 import logging
 from dotenv import load_dotenv
-import google.generativeai as genai
+from groq import Groq
 
 # Load environment variables
 load_dotenv()
@@ -18,12 +18,13 @@ logging.basicConfig(
     ]
 )
 
-# Configure Gemini API
-API_KEY = os.getenv("GEMINI_API_KEY")
+# Configure Groq API
+API_KEY = os.getenv("GROQ_API_KEY")
 if API_KEY:
-    genai.configure(api_key=API_KEY)
+    client = Groq(api_key=API_KEY)
 else:
-    logging.warning("GEMINI_API_KEY is not set in environment. Intent classifier will fail-safe to 'ADVISORY'.")
+    client = None
+    logging.warning("GROQ_API_KEY is not set in environment. Intent classifier will fail-safe to 'ADVISORY'.")
 
 SYSTEM_INSTRUCTION = """
 You are a classification assistant. Your task is to classify user queries about mutual funds into either 'FACTUAL' or 'ADVISORY'.
@@ -36,29 +37,34 @@ Format your response strictly as JSON with a single key 'intent' whose value is 
 
 def classify_query(query: str) -> str:
     """
-    Classify the query intent using Gemini 1.5 Flash.
+    Classify the query intent using Groq llama-3.1-8b-instant.
     Defaults to 'ADVISORY' as a security fail-safe on error.
     """
-    if not API_KEY:
-        logging.error("Gemini API key missing. Defaulting to 'ADVISORY' refusal.")
+    if not client:
+        logging.error("Groq API key missing. Defaulting to 'ADVISORY' refusal.")
         return "ADVISORY"
         
     try:
-        model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
-            generation_config={"response_mime_type": "application/json"}
-        )
-        
         prompt = f"""{SYSTEM_INSTRUCTION}
 
 User Query: "{query}"
 JSON Response:"""
         
         logging.info(f"Classifying query: '{query}'")
-        response = model.generate_content(prompt)
+        
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            model="llama-3.1-8b-instant",
+            response_format={"type": "json_object"},
+            temperature=0.0
+        )
+        
+        response_text = chat_completion.choices[0].message.content.strip()
         
         # Parse the JSON output
-        result_dict = json.loads(response.text.strip())
+        result_dict = json.loads(response_text)
         intent = result_dict.get("intent", "ADVISORY").upper()
         
         if intent not in ["FACTUAL", "ADVISORY"]:

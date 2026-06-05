@@ -50,47 +50,45 @@ class TestPIIScrubber(unittest.TestCase):
 
 
 class TestIntentClassifier(unittest.TestCase):
-    @patch("google.generativeai.GenerativeModel")
-    def test_factual_query_classification_mock(self, mock_model_class):
-        # Set up mock response for Gemini model
-        mock_model = MagicMock()
+    @patch("src.guardrails.classifier.client")
+    def test_factual_query_classification_mock(self, mock_client):
+        # Set up mock response for Groq model
         mock_response = MagicMock()
-        mock_response.text = '{"intent": "FACTUAL"}'
-        mock_model.generate_content.return_value = mock_response
-        mock_model_class.return_value = mock_model
+        mock_response.choices = [
+            MagicMock(message=MagicMock(content='{"intent": "FACTUAL"}'))
+        ]
+        mock_client.chat.completions.create.return_value = mock_response
         
         # Run classification with patches in place
-        with patch("src.guardrails.classifier.API_KEY", "mock-api-key"):
+        with patch("src.guardrails.classifier.client", mock_client):
             intent = classify_query("What is the NAV of HDFC Small Cap Fund?")
             self.assertEqual(intent, "FACTUAL")
 
-    @patch("google.generativeai.GenerativeModel")
-    def test_advisory_query_classification_mock(self, mock_model_class):
-        # Set up mock response for Gemini model
-        mock_model = MagicMock()
+    @patch("src.guardrails.classifier.client")
+    def test_advisory_query_classification_mock(self, mock_client):
+        # Set up mock response for Groq model
         mock_response = MagicMock()
-        mock_response.text = '{"intent": "ADVISORY"}'
-        mock_model.generate_content.return_value = mock_response
-        mock_model_class.return_value = mock_model
+        mock_response.choices = [
+            MagicMock(message=MagicMock(content='{"intent": "ADVISORY"}'))
+        ]
+        mock_client.chat.completions.create.return_value = mock_response
         
-        with patch("src.guardrails.classifier.API_KEY", "mock-api-key"):
+        with patch("src.guardrails.classifier.client", mock_client):
             intent = classify_query("Should I buy HDFC Mid Cap Opportunities Fund?")
             self.assertEqual(intent, "ADVISORY")
 
     def test_classification_failsafe_no_key(self):
-        # If API_KEY is unset/None, classify_query must return "ADVISORY"
-        with patch("src.guardrails.classifier.API_KEY", None):
+        # If client is unset/None, classify_query must return "ADVISORY"
+        with patch("src.guardrails.classifier.client", None):
             intent = classify_query("What is the exit load of HDFC Small Cap?")
             self.assertEqual(intent, "ADVISORY")
 
-    @patch("google.generativeai.GenerativeModel")
-    def test_classification_failsafe_on_exception(self, mock_model_class):
-        # If generate_content throws an exception, must fallback to "ADVISORY"
-        mock_model = MagicMock()
-        mock_model.generate_content.side_effect = Exception("API error")
-        mock_model_class.return_value = mock_model
+    @patch("src.guardrails.classifier.client")
+    def test_classification_failsafe_on_exception(self, mock_client):
+        # If chat completion throws an exception, must fallback to "ADVISORY"
+        mock_client.chat.completions.create.side_effect = Exception("API error")
         
-        with patch("src.guardrails.classifier.API_KEY", "mock-api-key"):
+        with patch("src.guardrails.classifier.client", mock_client):
             intent = classify_query("What is the exit load of HDFC Small Cap?")
             self.assertEqual(intent, "ADVISORY")
 
