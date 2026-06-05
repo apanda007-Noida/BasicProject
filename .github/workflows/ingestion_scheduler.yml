@@ -39,5 +39,6 @@ jobs:
       env:
         GEMINI_API_KEY: ""
         GROQ_API_KEY: ""
+        PYTHONPATH: "."
       run: |
         python -m unittest discover tests
