@@ -28,6 +28,7 @@ jobs:
     - name: Run Scraper Ingestion
       run: |
         python src/ingestion/scraper.py
+        python src/rag/indexer.py
 
     - name: Verify Ingested Data Quality
       run: |
