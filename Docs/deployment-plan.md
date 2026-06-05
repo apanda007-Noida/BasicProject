@@ -16,7 +16,7 @@ graph TD
     Client[Browser UI] -->|HTTPS| Proxy[Nginx / Caddy Proxy]
     Proxy -->|Port 8000| FastAPI[FastAPI Server]
     FastAPI -->|Query| Scrubber[PII Scrubber]
-    Scrubber -->|Classify| Gemini[Gemini API - Factual/Advisory]
+    Scrubber -->|Classify| GroqClassify[Groq API - Intent Classification]
     Scrubber -->|Search Chunks| Chroma[(Local ChromaDB)]
     Scrubber -->|Synthesize| Groq[Groq API - Llama 3.1]
     Cron[Cron Service / Scheduler] -->|Daily 10:00 AM IST| Scraper[Web Scraper]
@@ -31,8 +31,6 @@ graph TD
 Create a production `.env` file in the application root directory:
 
 ```env
-# API Keys (Required in Production)
-GEMINI_API_KEY=your_gemini_api_key_here
 GROQ_API_KEY=your_groq_api_key_here
 
 # Server Bindings
@@ -91,7 +89,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
       - GROQ_API_KEY=${GROQ_API_KEY}
     volumes:
       - faq-data:/app/data
@@ -118,7 +115,7 @@ If deploying to a PaaS platform like **Render** or **Railway**:
         uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
         ```
     *   **Disk Mount (Important)**: Mount a persistent directory at `/app/data` (minimum 1GB) so that cached ChromaDB vectors and ingested files persist across service redeployments.
-2.  **Add Environment Variables**: Set `GEMINI_API_KEY` and `GROQ_API_KEY` in the service settings panel.
+2.  **Add Environment Variables**: Set `GROQ_API_KEY` in the service settings panel.
 
 ---
 
