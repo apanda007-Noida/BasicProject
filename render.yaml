@@ -5,10 +5,6 @@ services:
     plan: free # Can be upgraded to starter if persistent disk requires paid tier on Render
     buildCommand: pip install -r requirements.txt && python src/ingestion/scraper.py && python src/rag/indexer.py
     startCommand: uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
-    disk:
-      name: faq-assistant-data
-      mountPath: /app/data
-      sizeGB: 1
     envVars:
       - key: GEMINI_API_KEY
         sync: false # User will input this in the Render dashboard
