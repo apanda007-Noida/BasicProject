@@ -100,22 +100,32 @@ volumes:
 
 ---
 
-## 4. Option B: Cloud PaaS Deployment (e.g., Render / Railway)
+## 4. Option B: Decoupled Cloud Deployment (Railway + Vercel)
 
-If deploying to a PaaS platform like **Render** or **Railway**:
+For a highly scalable decoupled architecture, deploy the FastAPI backend to **Railway** and the static frontend UI to **Vercel**.
 
-1.  **Configure Web Service**:
-    *   **Repository**: Link your GitHub repository (`BasicProject`).
-    *   **Build Command**:
-        ```bash
-        pip install -r requirements.txt && python src/ingestion/scraper.py && python src/rag/indexer.py
-        ```
-    *   **Start Command**:
-        ```bash
-        uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
-        ```
-    *   **Disk Mount (Important)**: Mount a persistent directory at `/app/data` (minimum 1GB) so that cached ChromaDB vectors and ingested files persist across service redeployments.
-2.  **Add Environment Variables**: Set `GROQ_API_KEY` in the service settings panel.
+### 4.1 Backend API on Railway
+
+1.  **Connect Repository**: Link your GitHub repository (`BasicProject`) to a new Railway project.
+2.  **Build Command**:
+    ```bash
+    pip install -r requirements.txt && python src/ingestion/scraper.py && python src/rag/indexer.py
+    ```
+3.  **Start Command**:
+    ```bash
+    uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
+    ```
+4.  **Environment Variables**: Set `GROQ_API_KEY` in the Railway variables panel.
+5.  **CORS Configuration**: Note the deployed Railway URL. You may need to add it to the `allow_origins` list in `src/api/main.py` if your frontend requires cross-origin requests.
+
+### 4.2 Frontend UI on Vercel
+
+1.  **Connect Repository**: Import the GitHub repository into Vercel.
+2.  **Configure Project Settings**:
+    *   **Framework Preset**: Other
+    *   **Output Directory**: `public`
+3.  **API Connection**: Update the fetch requests in `public/app.js` to point to your new Railway backend URL instead of relative paths (e.g., change `fetch('/api/chat')` to `fetch('https://your-railway-app.up.railway.app/api/chat')`).
+4.  **Deploy**: Vercel will instantly serve the static files from the `public` directory over its edge CDN.
 
 ---
 
